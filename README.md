@@ -8,9 +8,10 @@ Foobar is a Python library for dealing with word pluralization.
 * Arduino Uno
 * Stepper Motor: Bipolar, 200 Steps/Rev, 35×26mm, 7.4V, 0.28 A/Pha
 
-
 ## Usage
-TODO
+* Install "Adafruit Motor Shield v2 Library"
+* Compile .ino file
+* Upload into Arduino
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
