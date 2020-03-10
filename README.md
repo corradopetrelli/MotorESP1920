@@ -3,10 +3,10 @@ Project for the Exam of ESP (A.Y. 19-20)
 Foobar is a Python library for dealing with word pluralization.
 
 ## Components
-Arduino IDE
-Adafruit Motor/Stepper/Servo Shield for Arduino v2 Kit - v2.3
-Arduino Uno
-Stepper Motor: Bipolar, 200 Steps/Rev, 35×26mm, 7.4V, 0.28 A/Pha
+* Arduino IDE
+* Adafruit Motor/Stepper/Servo Shield for Arduino v2 Kit - v2.3
+* Arduino Uno
+* Stepper Motor: Bipolar, 200 Steps/Rev, 35×26mm, 7.4V, 0.28 A/Pha
 
 
 ## Usage
