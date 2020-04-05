@@ -1,14 +1,9 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 
-#define DISTANZA_RUOTE 15 //cm
-#define CIRCONFERENZA_RUOTA 18.85 //cm
-#define CM_CON_ONESTEP 0.47 //cm
-
-//Note
-//5 RIVOLUZIONI (5*200 steps = 1000 steps) DELLA RUOTA EQUIVALE A GIRARE SU SE STESSA QUINDI 2PI
-//Quindi se voglio girare di 45° (ricavando il n° di step da fare): 1000 : 360 = x : 45 quindi x = 125
-
+#define MULT_TURN_ON_ITSELF 1.2962 // 35:27
+#define MULT_TURN_ON_WHEEL 2.5925 //  70:27
+#define CM_WITH_ONESTEP 0.47 //cm
 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -26,20 +21,14 @@ void setup() {
   leftMotor->setSpeed(10);  // 10 rpm
   rightMotor->setSpeed(10);  // 10 rpm
 
-
-  //TEST CODE
-  for(int i = 0; i < 200; i++)
-    vaiDritto();
-  giraSuSeStesso(45,true);
-  for(int i = 0; i < 200; i++)
-    vaiDritto(); 
-  
+  //TESTING CODE
+  goStraight();
 }
 
 
 /*
  * Description:
- *    Vai dritto di 0,47 cm
+ *    Go Straight of 0,47 cm
  * 
  * Parameters:
  *    None
@@ -48,28 +37,28 @@ void setup() {
  *    None
  * 
  * Notes and Warnings:
- *    Metodo bloccante
+ *    Blocking method
  */
-void vaiDritto() {
+void goStraight() {
   leftMotor->onestep(FORWARD, SINGLE);
   rightMotor->onestep(BACKWARD, SINGLE);
 }
 
 /*
  * Description:
- *    Vai dritto di X cm
+ *    Go Straight of X cm
  * 
  * Parameters:
- *    cm: numero di centrimetri da percorrere
+ *    cm: cm to perform
  * 
  * Returns:
  *    None
  * 
  * Notes and Warnings:
- *    Metodo bloccante
+ *    Blocking method
  */
-void vaiDritto(int cm) {
-  int stepToDo = cm / CM_CON_ONESTEP;
+void goStraightOf(unsigned cm) {
+  unsigned int stepToDo = cm / CM_WITH_ONESTEP;
   for(int i = 0; i < stepToDo; i++){
     leftMotor->onestep(FORWARD, SINGLE);
     rightMotor->onestep(BACKWARD, SINGLE);
@@ -80,69 +69,74 @@ void vaiDritto(int cm) {
 
 /*
  * Description:
- *    Gira solamente con una ruota verso sinistra (Centro di rotazione: ruota sinistra)
+ *    Turn on only with a wheel (Rotation center: left wheel)
  * 
  * Parameters:
- *    gradi: gradi di rotazione
- *    isAvanti:
- *      - true: gira in avanti (senso antiorario)
- *      - false: gira all'indietro (senso orario)
+ *    degreesRotation: rotation degrees of ants
+ *    isForward:
+ *      - true: turn on forward (senso orario)
+ *      - false: turn on backward (senso antiorario)
  * 
  * Returns:
  *    None
  * 
  * Notes and Warnings:
- *    Metodo bloccante
+ *    blocking methods
  */
-void giraSuUnaRuotaVersoSinistra(int gradi, boolean isAvanti) {
-  rightMotor->step(5 * gradi, (isAvanti)? BACKWARD:FORWARD, SINGLE);
+void turnWithTheLeftWheel(unsigned int degreesRotation, bool isForward) {
+  rightMotor->step(degreesRotation*MULT_TURN_ON_WHEEL, (isForward)? BACKWARD:FORWARD, SINGLE);
 }
 
 /*
  * Description:
- *    Gira solamente con una ruota verso destra (Centro di rotazione: ruota destra)
+ *    Turn on only with a wheel (Rotation center: right wheel)
  * 
  * Parameters:
- *    gradi: gradi di rotazione
- *    isAvanti:
- *      - true: gira in avanti (senso orario)
- *      - false: gira all'indietro (senso antiorario)
+ *    degreesRotation: rotation degrees of ants
+ *    isForward:
+ *      - true: turn on forward (senso orario)
+ *      - false: turn on backward (senso antiorario)
  * 
  * Returns:
  *    None
  * 
  * Notes and Warnings:
- *    Metodo bloccante
+ *    blocking methods
  */
-void giraSuUnaRuotaVersoDestra(int gradi, boolean isAvanti) {
-  leftMotor->step(5 * gradi, (isAvanti)? FORWARD:BACKWARD, SINGLE);
+void turnWithTheRightWheel(unsigned int degreesRotation, bool isForward) {
+  leftMotor->step(degreesRotation*MULT_TURN_ON_WHEEL, (isForward)? FORWARD:BACKWARD, SINGLE);
 }
 
 
 /*
  * Description:
- *    Gira su se stesso (Centro di rotazione: 1/2 della distanza tra le ruote)
+ *    Turn on itself (Rotation center equals to 1/2 of distance between the wheels)
  * 
  * Parameters:
- *    gradi: gradi di rotazione
- *    isOrario:
- *      - true: gira in senso orario
- *      - false: gira in senso antiorario
+ *    rotationDegrees: rotation degrees of ants
  * 
  * Returns:
  *    None
  * 
  * Notes and Warnings:
- *    Metodo bloccante
+ *    blocking method
  */
-void giraSuSeStesso(int gradi, boolean isOrario){
-  //Se 5*gradi è dispari si perde uno step da fare (mezzo centimetro per ruota)
-  int stepToDo = (int)((5*gradi)/2);
-  for(int i = 0; i < stepToDo; i++){
-    rightMotor->onestep((isOrario)?FORWARD:BACKWARD,DOUBLE);
-    leftMotor->onestep((isOrario)?FORWARD:BACKWARD,DOUBLE);
+void giraSuSeStesso(int rotationDegrees){
+  unsigned int stepToDo;
+  
+  if(rotationDegrees > 0){
+    stepToDo = (unsigned int)(rotationDegrees*MULT_TURN_ON_ITSELF);
+    for(unsigned int i = 0; i < stepToDo; i++){
+      rightMotor->onestep(FORWARD,SINGLE);
+      leftMotor->onestep(FORWARD,SINGLE);
+    }
+  }else{
+    stepToDo = (unsigned int)(-rotationDegrees*MULT_TURN_ON_ITSELF);
+    for(unsigned int i = 0; i < stepToDo; i++){
+      rightMotor->onestep(BACKWARD,SINGLE);
+      leftMotor->onestep(BACKWARD,SINGLE);
+    }
   }
-
 }
 
 
