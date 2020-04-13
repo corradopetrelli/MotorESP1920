@@ -57,7 +57,7 @@ void goStraight() {
  * Notes and Warnings:
  *    Blocking method
  */
-void goStraightOf(unsigned cm) {
+void goStraightOf(unsigned int cm) {
   unsigned int stepToDo = cm / CM_WITH_ONESTEP;
   for(int i = 0; i < stepToDo; i++){
     leftMotor->onestep(FORWARD, SINGLE);
